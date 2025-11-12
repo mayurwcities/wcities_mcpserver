@@ -11,6 +11,7 @@ PORT=3001
 
 after creatioon of .env file execute "npm install"
 
+change the path of logs const LOG_FILE = "D:\\backend\\mcp-server.log"; on line no. 8
 
 Follow the given steps to enable mcp server in cursor
 

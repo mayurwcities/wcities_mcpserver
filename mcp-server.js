@@ -181,19 +181,20 @@ server.tool("eventDetail", "Event details", { id: z.string() }, async ({ id }) =
   return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
 });
 
-server.tool("eventSimilar", "Similar events", { id: z.string() }, async ({ id }) => {
-  log(`🔧 eventSimilar`);
-  const params = { oauth_token: OAUTH_TOKEN, id, similar: "enable" };
-  params.sortBy = "distance";
-  params.moreInfo = "cityid,fallbackimage,artistdesc,artistmusic,multiplebooking,eventcount,endtime,tbd_annual,is_master,provider";
-  params.link = "enable";
-  params.media = "enable";
-  params.strip_html='name';
-  const url = `${BASE_URL}/event_api/getEvents.php?${q(params)}`;
-  log(`📡 ${url}`);
-  const response = await axios.get(url);
-  return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
+// ============ SIMILAR EVENT API ============
+server.tool("similarEvents", "Get similar events ", { id: z.string(), limit: z.string().optional() }, 
+  async ({ id, limit }) => {
+    log(`🔧 eventSimilarDedicated`);
+    const params = { oauth_token: OAUTH_TOKEN, id };
+    if (limit) params.limit = limit;
+    const url = `${BASE_URL}/similar_event/getSimilarEvents.php?${q(params)}`;
+    log(`📡 ${url}`);
+    const response = await axios.get(url);
+    return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
 });
+
+
+
 
 // ============ ARTIST API ============
 server.tool("artistSearch", "Search artists", { artist: z.string(), limit: z.number().optional() }, async ({ artist, limit }) => {
@@ -271,6 +272,19 @@ server.tool("artistNearby", "Nearby artists", { lat: z.number(), lon: z.number()
   log(`📡 ${url}`);
   const response = await axios.get(url);
   return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
+});
+
+
+server.tool("artistTracks", "Get artist music tracks from Spotify", 
+  { id: z.string(), trackType: z.enum(["spotify"]).optional() }, 
+  async ({ id, trackType }) => {
+    log(`🔧 artistTracks`);
+    const params = { oauth_token: OAUTH_TOKEN, method: "artistTracks", id };
+    params.trackType = trackType || "spotify";
+    const url = `${BASE_URL}/artist_api/getArtist.php?${q(params)}`;
+    log(`📡 ${url}`);
+    const response = await axios.get(url);
+    return { content: [{ type: "text", text: JSON.stringify(response.data) }] };
 });
 
 // ============ RECORD/POI API ============
